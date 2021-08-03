@@ -74,7 +74,7 @@ data$serious_injury_kts <- (data$surg_1 == 1) | (data$dispo_loc %in% c(0,1)) | (
 # Next, the values that were false became NA, which then are filled with FALSE
 data$serious_injury_kts[is.na(data$serious_injury_kts)] <- FALSE
 # Finally, I replace TRUE and FALSE for 1 and 2, respectively
-data$serious_injury_kts <- car::recode(data$serious_injury_kts, "TRUE=1;FALSE=2")
+data$serious_injury_kts <- car::recode(data$serious_injury_kts, "TRUE=0;FALSE=1")
 ```
 
 ## Creating the kts_mod variable
