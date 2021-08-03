@@ -3,8 +3,17 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+
+```{r}
+library(car)
+library(dplyr)
+library(gmodels)
+library(tidyverse)
+```
+
 Reading data
 ```{r}
+### --> Replace this for your dataset
 data <- read.csv("/media/newhd/joao-souza/projects/GEMINI/TOC_M4/toc_data_testing_models_R.csv",
                  na.strings = c("",'NA'))
 
@@ -16,39 +25,44 @@ data$long_y_n <- fractures$long_y_n
 data$classification <- fractures$classification
 ```
 
-The new KTS calculation will have modifications on the way to determine wether a patient has serious injuries.
+The new KTS-II calculation will have modifications on the way to determine wether a patient has serious injuries.
 It will consider ED disposition, presence of longbone fractures, need for surgery, multiple injuries, and TBI
 
 ## Coding Age
 ```{r}
 ## recoding age for KTS 
-##### Less than 5 (1); 5 to 55 (2); more than 55 (1)
-data$age_kts <- as.numeric(as.character(cut(data$age, breaks=c(-1, 4, 55, 500), labels=c(1 , 2, 1))))
+##### Less than 5 (0); 5 to 55 (1); more than 55 (0)
+data$age_kts <- as.numeric(as.character(cut(data$age, breaks=c(-1, 4, 55, 500), labels=c(0 , 1, 0))))
 ```
 
 ## Coding systolic blood pressure
 
 ```{r}
 ## recoding systolic blood pressure for kts 
-##### 0 (1); 1 to 49 (2); 50 to 89 (3); more than 89 (4)
-data$sbp_arred_kts <- as.numeric(as.character(cut(data$sbp_arred, breaks=c(-1,0,49,89,500), labels=c(1,2,3,4))))
+##### Below or equal to 49 (0); 50 to 89 (1); more than 89 (2)
+data$sbp_arred_kts <- as.numeric(as.character(cut(data$sbp_arred, breaks=c(-1,49,89,500), labels=c(0,1,2))))
 ```
 
 ## Coding respiratory rate
 ```{r}
-## recoding respiratory rate for kts ->
-data$rr_arred_kts  <- as.numeric(as.character(cut(data$rr_arred, breaks=c(-Inf,8,29,Inf), labels=c(1,3,2))))
+## recoding respiratory rate for kts
+##### Below or equal to 9 (0); Between 10 and 29 (2); more than 30 (1)
+data$rr_arred_kts  <- as.numeric(as.character(cut(data$rr_arred, breaks=c(-Inf,8,29,Inf), labels=c(0,2,1))))
 ```
 
 ## Coding avpu
 ```{r}
+table(data$avpu_arred)
 ## recoding avpu_arred for kts -> First I replace the codes for the actual classes in the codebook
 data$avpu_arred_kts <- car::recode(data$avpu_arred,"0='Alert'; 1='Responds to verbal stimuli only';
                                    2='Responds to painful stimuli only';
                                    3='Unresponsive'")
-# then I assign the values --> Alert (4); Verbal (3); Painful (2); Unresponsive (1)
-data$avpu_arred_kts <- as.numeric(car::recode(data$avpu_arred_kts,"'Alert'=4; 'Responds to verbal stimuli only'=3;
-                                   'Responds to painful stimuli only'=2; 'Unresponsive'=1"))
+sum(is.na(data$avpu_arred_kts))
+table(data$avpu_arred_kts)
+# then I assign the values --> Alert (3); Verbal (2); Painful (1); Unresponsive (0)
+data$avpu_arred_kts <- as.numeric(car::recode(data$avpu_arred_kts,"'Alert'=3; 'Responds to verbal stimuli only'=2;
+                                   'Responds to painful stimuli only'=1; 'Unresponsive'=0"))
+table(data$avpu_arred_kts)
 ```
 
 ## Serious injury
@@ -61,7 +75,6 @@ data$serious_injury_kts <- (data$surg_1 == 1) | (data$dispo_loc %in% c(0,1)) | (
 data$serious_injury_kts[is.na(data$serious_injury_kts)] <- FALSE
 # Finally, I replace TRUE and FALSE for 1 and 2, respectively
 data$serious_injury_kts <- car::recode(data$serious_injury_kts, "TRUE=1;FALSE=2")
-
 ```
 
 ## Creating the kts_mod variable
@@ -70,4 +83,3 @@ data$kts_mod <- (data$age_kts + data$sbp_arred_kts + data$rr_arred_kts + data$av
 
 table(data$kts_mod)
 ```
-
