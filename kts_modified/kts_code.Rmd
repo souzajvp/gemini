@@ -73,7 +73,7 @@ table(data$avpu_arred_kts)
 data$serious_injury_kts <- (data$surg_1 == 1) | (data$dispo_loc %in% c(0,1)) | (data$long_y_n %in% c("Long", "Spine")) | (data$classification == "multiple") | (data$tbiyn == 1)
 # Next, the values that were false became NA, which then are filled with FALSE
 data$serious_injury_kts[is.na(data$serious_injury_kts)] <- FALSE
-# Finally, I replace TRUE and FALSE for 1 and 2, respectively
+# Finally, I replace TRUE and FALSE for 0 and 1, respectively
 data$serious_injury_kts <- car::recode(data$serious_injury_kts, "TRUE=0;FALSE=1")
 ```
 
