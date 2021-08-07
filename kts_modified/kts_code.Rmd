@@ -83,3 +83,11 @@ data$kts_mod <- (data$age_kts + data$sbp_arred_kts + data$rr_arred_kts + data$av
 
 table(data$kts_mod)
 ```
+
+## Injury severity (KTS_classified)
+Severe injury (KTS <= 5); Moderate (6-7); Mild (8-9) 
+```{r}
+data$kts_mod_class <- cut(data$kts_mod, breaks=c(0,5,7,9),
+                          labels=c("Severe", "Moderate", "Mild"))
+table(data$kts_mod_class)
+```
