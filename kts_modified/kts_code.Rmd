@@ -57,12 +57,10 @@ table(data$avpu_arred)
 data$avpu_arred_kts <- car::recode(data$avpu_arred,"0='Alert'; 1='Responds to verbal stimuli only';
                                    2='Responds to painful stimuli only';
                                    3='Unresponsive'")
-sum(is.na(data$avpu_arred_kts))
-table(data$avpu_arred_kts)
 # then I assign the values --> Alert (3); Verbal (2); Painful (1); Unresponsive (0)
-data$avpu_arred_kts <- as.numeric(car::recode(data$avpu_arred_kts,"'Alert'=3; 'Responds to verbal stimuli only'=2;
-                                   'Responds to painful stimuli only'=1; 'Unresponsive'=0"))
-table(data$avpu_arred_kts)
+data$avpu_arred_kts <- as.numeric(car::recode(data$avpu_arred_kts,
+"'Alert'=3; 'Responds to verbal stimuli only'=2;
+ 'Responds to painful stimuli only'=1; 'Unresponsive'=0"))
 ```
 
 ## Serious injury
