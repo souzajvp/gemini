@@ -18,10 +18,11 @@ data <- read.csv("/media/newhd/joao-souza/projects/GEMINI/TOC_M4/toc_data_testin
                  na.strings = c("",'NA'))
 
 #### Fracture data from my github
-fractures <- read.csv("https://raw.githubusercontent.com/souzajvp/gemini/main/kts_modified/fracture_variables.csv")
+fractures <- read.csv("https://raw.githubusercontent.com/souzajvp/gemini/main/kts_modified/fracture_variables.csv", na.strings = "")
 #### Insert columns from fractures into the general dataframe
+# Type of bone affected
 data$long_y_n <- fractures$long_y_n
-
+# Bone affected
 data$classification <- fractures$classification
 ```
 
@@ -52,7 +53,6 @@ data$rr_arred_kts  <- as.numeric(as.character(cut(data$rr_arred, breaks=c(-Inf,9
 
 ## Coding avpu
 ```{r}
-table(data$avpu_arred)
 ## recoding avpu_arred for kts -> First I replace the codes for the actual classes in the codebook
 data$avpu_arred_kts <- car::recode(data$avpu_arred,"0='Alert'; 1='Responds to verbal stimuli only';
                                    2='Responds to painful stimuli only';
@@ -68,7 +68,7 @@ data$avpu_arred_kts <- as.numeric(car::recode(data$avpu_arred_kts,
 ```{r}
 # Here I check if There is indication for surgery; If the patient is either in O.R or ICU; If there were fractures on either Long bones or Spine; If there are multiple injuries; If there is TBI
 # This is then set in the serious_injury_kts variable
-data$serious_injury_kts <- (data$surg_1 == 1) | (data$dispo_loc %in% c(0,1)) | (data$long_y_n %in% c("Long", "Spine")) | (data$classification == "multiple") | (data$tbiyn == 1)
+data$serious_injury_kts <- (data$surg_1 == 1) | (data$dispo_loc %in% c(0,1)) | (data$long_y_n %in% c("Long", "Spine")) | (data$classification == "Multiple") | (data$tbiyn == 1)
 # Next, the values that were false became NA, which then are filled with FALSE
 data$serious_injury_kts[is.na(data$serious_injury_kts)] <- FALSE
 # Finally, I replace TRUE and FALSE for 0 and 1, respectively
